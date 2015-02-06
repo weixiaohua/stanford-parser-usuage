@@ -5,6 +5,7 @@ import org.ansj.domain.Term;
 import org.ansj.splitWord.analysis.ToAnalysis;
 
 import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.ling.Label;
 import edu.stanford.nlp.ling.Sentence;
 import edu.stanford.nlp.parser.lexparser.LexicalizedParser;
 import edu.stanford.nlp.process.CoreLabelTokenFactory;
@@ -37,7 +38,7 @@ public class PaserTest {
 	  public static void demoAPI(LexicalizedParser lp) {
 	    // This option shows parsing a list of correctly tokenized words
 	   // String[] sent = { "This", "is", "an", "easy", "sentence", "." };//涉及 一种 组织 工程化 周围神经 产品 及 制备 方法
-		  String str = "涉及一种组织工程化周围神经产品及制备方法,";
+		  String str = "组织工程化周围神经产品由神经导管和神经胶质细胞或干细胞构建而成";
 		  List<Term> term = ToAnalysis.parse(str);
 		  String[] sent = new String[term.size()];
 		  System.out.println(term.toString());
@@ -72,16 +73,37 @@ public class PaserTest {
 	    tp.printTree(parse);*/
 	  }
 	  
-	  public static void treePrinter(Tree parse){		  
-			  Tree[] kids = parse.children();
-			  if(parse.depth()==2 && parse.value().equals("NP")){
-				  System.out.println("NP : "+parse.numChildren()+"_"+parse.getLeaves().toString());
-			  }
-			  for (Tree tree : kids) {				  
-				  //System.out.println(tree.nodeString()+"_"+tree.depth()+"_"+tree.value()+"_"+tree.isLeaf());
-				  if(tree.isLeaf())
-					  return;
-				  treePrinter(tree);
-			  }			  
-	  }
+	public static void treePrinter(Tree parse) {
+		Tree[] kids = parse.children();
+		if (parse.score() == 1.0) {
+			// we set the sinal
+		}
+		if (parse.depth() == 2 && parse.value().equals("NP")) {
+			System.out.println("NP : " + parse.numChildren() + "_"+ parse.getLeaves().toString() + "_" + parse.score());
+			if (parse.numChildren() == 1) {
+				// one word
+			}
+			
+			//much words
+			int count = 0;
+			for (Tree tree : parse.getLeaves()) {
+				if (tree.value().equals("NN")) {
+					count++;
+				}
+			}
+			if (count != parse.getLeaves().size()) {
+				// has CC need to separate
+			}
+			return;
+		}
+		//parse.siblings(parse); brothers
+		// parse.parent();//father
+		// parse.setScore(1.0);;
+		for (Tree tree : kids) {
+			// System.out.println(tree.nodeString()+"_"+tree.depth()+"_"+tree.value()+"_"+tree.isLeaf());
+			if (tree.isLeaf())
+				return;
+			treePrinter(tree);
+		}
+	}
 }
